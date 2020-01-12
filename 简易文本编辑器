@@ -1,0 +1,691 @@
+#include <stdio.h>
+#include <stdlib.h>
+//定义txt结构，用于存储数据的行和字符串 
+struct txt{
+	int r;
+	char str[1000];
+	struct txt *next;
+};
+//定义一个存储密码的变量 
+static int toy=456789; 
+// FILE *fp;
+//22个函数 
+struct txt *start;
+void print(); 
+int jiami(int p);	
+int change_mima(int p);
+void mystrcpya(char *s3,char *s4,char *ch);
+int mystrcmp(char *s1,char *s2); 
+void mystrcpy(char *s3,char *s4);
+FILE *opena();
+FILE *openb();
+struct txt *show();
+void showa(); 
+struct txt *add(struct txt *head);
+struct txt *dela(struct txt *head);
+struct txt *create(int m);
+struct txt *multy(struct txt *ptr1,struct txt *ptr2,int r);
+struct txt *insert(int m); 
+struct txt *del(int m);
+struct txt *copya(int n,int m,int k);
+int modify(int x);
+void find(int d);
+void finda(char s[]);
+int change(int f);
+struct txt *changea(char ch[]);
+void save();
+//主函数 
+int main(){
+	int count,n,m,k,jia,j;
+	start=NULL;
+	int a; 
+	print();
+	//用户密码登录界面 
+	printf("请在应用本程序前登录密码：");
+	scanf("%d",&a);
+	jia=jiami(a);
+	if(jia==0){
+		printf("密码登录错误，请重新执行该程序！\n");
+		return 0;
+	} 
+	printf("是否修改密码？\n1.是 2.否\n请输入序号：");
+	scanf("%d",&j);
+	if(j==1){
+		toy=(change_mima(a)); 
+		printf("请重新登录密码：");
+		scanf("%d",&a);
+		toy=a; 
+		jia=jiami(a);
+		if(jia==0){
+			printf("密码登录错误，请重新执行该程序！\n");
+			return 0;
+		} 
+	}
+	print();
+	//选项界面 
+	do{
+		//功能菜单 
+		printf("\t*******************************************************************************\n");
+		printf("\t\t\t\t\t请选择：\n");
+		printf("\t\t1.打开文件（新或旧）\t2.显示链表或文件内容\t3.插入行\n\t\t4.删除行\t5.拷贝行\t");
+		printf("6.修改行\n\t\t7.查找字符串\t8.替换字符串\t9.存盘退出\t0.放弃编辑\n");
+		printf("\t*******************************************************************************\n");
+		scanf("%d",&count); 
+		switch(count){
+			case 1:
+				print();	//优化界面 
+				opena();	// 开文件 
+				print();	//优化界面	
+				break;
+			case 2:
+				print();
+				printf("1.显示链表内容\t2.显示文件内容\n请输入选项：");
+				int f;
+				scanf("%d",&f);		//选择要显示的内容出处 
+				switch(f){
+					case 1:
+						//链表为空 
+						if(start==NULL){
+							printf("\t\t**************链表为空**************\n"); 
+							break;
+						}
+						//链表不为空 
+						show();
+						break;
+					case 2:
+						//显示文件 
+						printf("如果文件中无内容，请勿执行此操作！\n"); 
+						showa();
+						break;
+				}
+				print();
+				break;
+			case 3:
+				print();
+				struct txt *prior;
+				printf("在第n行前插入m行，请输入n m: \n");
+				scanf("%d%d",&n,&m);
+				printf("请顺序输入待插入的内容：\n");
+				printf("格式如：1 str\n");
+				if(start==NULL) start=create(m);	//链表为空，创建新链表 
+				else{
+					prior=insert(m);				//链表不为空，创建新链表 
+					start=multy(start,prior,n);		//连接链表 
+				}
+				print();
+				break;
+			case 4:
+				print();
+				int lm;
+				printf("请问是否要删除或继续删除：\n请输入选项:1.是 2.否");
+				scanf("%d",&lm);
+				while(lm!=2){
+					int i,j;
+					printf("删除第m行:请输入m:\n");
+					scanf("%d",&j);
+					start=del(j);			//链表更新为删除后的链表 
+					printf("请问是否要删除或继续删除：\n请输入选项:1.是 2.否");
+					scanf("%d",&lm);
+				}
+				dela(start);
+				print();
+				break;
+			case 5:
+				print();
+				printf("把第n行开始的m行插在原k行之前，请输入n m k: ");
+				scanf("%d%d%d",&n,&m,&k);
+				start=copya(n,m,k);		//链表更新为拷贝后的链表 
+				print();
+				break;
+			case 6:
+				print();
+				int x,h;
+				printf("请输入待修改的行号： ");
+				scanf("%d",&x); 
+				h=modify(x);		//h判断是否修改了链表
+				//h为0，表示未找到要修改的链表 
+				if(h==0){
+					printf("没有找到需要修改的行号，请重新执行程序！\n");
+				}
+				print();
+				break;
+			case 7:
+				print();
+				int d;
+				int choice;
+				printf("1.按行查找\t\t2.按字符串查找\n请输入选项： ");
+				scanf("%d",&choice);		//输入要查找的方式的选项 
+				switch(choice){
+					case 1:
+						printf("请输入待查找的行号： ");
+						scanf("%d",&d);
+						find(d);		//按行查找函数 
+						break;
+					case 2:
+						char s[1000];
+						printf("请输入待查找的字符串： ");
+						scanf("%s",s);
+						finda(s);		//按字符串查找函数 
+						break;
+				}
+				print();
+				break;
+			case 8:
+				print();
+				int c;
+				printf("1.按行执行\t\t2.按字符串执行\n请输入选择：");
+				scanf("%d",&c);			//输入要替换的方式的选项 
+				switch(c){
+					case 1:
+						int h;
+						printf("请输入要操作的行号： ");
+						scanf("%d",&h);		 
+						if(change(h)==0){	//调用要替换的函数，如果没有找到返回0 
+							printf("没有找到，请重新执行操作\n");
+						}
+						break;
+					case 2:
+						char ch[1000];
+						printf("请输入替换前的字符串：");	 
+						scanf("%s",ch);
+						start=changea(ch);	//更新替换后的链表 
+						break;
+				}
+				print();
+				break;
+			case 9:
+				print();
+				save();				//保存链表到文件 
+				print();
+				exit(0);			//退出 
+			case 0:
+				break;
+		}
+	}while(count!=0);
+	return 0;
+}
+//优化界面 
+void print(){
+	printf("******************************\n");
+}
+//密码
+int jiami(int p){
+	if(p==toy)
+		return 1;
+	return 0;
+}
+//修改密码 
+int change_mima(int p){
+	int x;
+	printf("请输入原密码：");
+	scanf("%d",&x);
+	if(x==p){
+		printf("请输入要修改的密码：");
+		scanf("%d",&x);
+		return x; 
+	} 
+	else{
+		printf("原密码输入错误，密码修改失败\n");
+		printf("如需修改密码请重启程序！\n");
+		return p;
+	}
+}
+//替换字符串 
+void mystrcpya(char *s3,char *s4,char *ch){
+	int t=0,t1;
+	while(*s3!='\0'){
+		if(*s3==*ch){
+			while(*ch!='\0'){
+				t++;
+				ch++;
+			}
+			break;
+		}
+		s3++;
+	} 
+	if(*s3=='\0'){
+		printf("没找到要修改的字符,自动加到末尾！\n");
+	}
+	while(*s4!='\0'){
+		*s3=*s4;
+		t1++;
+		s3++;
+		s4++;
+	} 
+	if(t1<t){
+		printf("您输的要替换的数据比你要换的数据少，系统自动帮你将一行全部替换！\n");
+		*s3='\0';
+	}
+}
+//自定义字符串拷贝
+void mystrcpy(char *s3,char *s4){
+	while(*s4!=NULL){
+		*s3=*s4;
+		s3++;
+		s4++;
+	}
+	*s3='\0';
+}//自定义字符串比较
+int mystrcmp(char *s1,char *s2){
+	int flag=0;
+	int temp=0;
+	if(*s1=='\0'||*s2=='\0') return -1;	//如果两字符串其一为空，便可直接判定其不相等 
+	while(*s1!='\0'){
+		//如果s1与s2的首字符相同，进行两字符串的比较 
+		if(*s1==*s2){
+			//有相等的字符temp为1 
+			temp=1;
+			while(1){
+				s1++;
+				s2++;
+				//判断s1是否与s2相等 
+				if(*s1!=*s2){
+					break;
+				}
+			}
+			//s1与s2完全相同则flag=1 
+			if(*s2=='\0'&&*s1=='\0'){
+				flag=1;
+				break;
+			}
+		}
+		//遍历s1直到找到与s2相同的s1首字符 
+		s1++;
+	}
+	if(flag==1) return 0;
+	if(temp==1) {
+		printf("找到相同的字符\n");
+		return 1;
+	}
+	return -1;
+}
+//打开文件，创建文件 
+FILE *opena(){
+	FILE *fp;
+	char s[50],*p;
+	int la,m;
+	printf("请输入要打开的文件名（可包括盘符、路径、不超过19个字符）,如C：/mydoc.txt：\n");
+	scanf("%s",s);
+	if((fp=fopen(s,"r"))==NULL){
+		printf("文件打开失败！\n");
+		//打开失败后，再给一次重新输入的机会 
+		printf("1.重新输入？2.重建？\n请输入选项：");	 
+		scanf("%d",&m);
+		switch(m){
+			case 1:
+				printf("请输入要打开的文件名（可包括盘符、路径、不超过19个字符）,如C：/mydoc.txt：\n");
+				scanf("%s",s);
+				if((fp=fopen("s","r"))==NULL)
+					printf("文件打开失败！\n");
+			case 2:
+				//创建新的文件 
+				printf("是否要创建新的文件？1.是 2.否\n请输入选项：");
+				scanf("%d",&la);
+				if(la==1){
+					printf("请输入要创建的文件名：\n");
+					printf("请输入要打开的文件名（可包括盘符、路径、不超过19个字符）,如C：/mydoc.txt：\n");
+					scanf("%s",s);
+					fp=fopen(s,"w");	//此处s不可加双引号，否则文件将始终打开失败 
+					if(fp){
+						printf("文件创建成功！\n");
+					}
+				}
+				if(la==2)
+					exit(0);
+				} 
+		}
+	printf("文件打开成功！\n"); 
+	return fp;
+}
+//保存文件，追加数据 
+FILE *openb(){
+	FILE *fp;
+	fp=opena();
+	if(fp==NULL){
+		printf("文件打开失败！\n");
+	}
+	printf("正在存入文件！\n存入成功\n");
+	return fp;
+}
+//显示链条数据 
+struct txt *show(){
+	struct txt *info;
+	info=start->next;
+	if(info==NULL){
+		printf("\n");
+	}
+	//遍历链表，输出链表的数据 
+	while(info){
+		printf("%d : %s\n",info->r,info->str);
+		info=info->next;
+	}
+	return start;
+}
+//显示文件内容 
+void showa(){
+	struct txt *info;
+	FILE *fp;
+	int number,hq;
+	printf("请输入要查看的文件中字符串个数："); 
+	//输入要查看的字符串个数，注意不要超出存进去的个数，否则会输出数字：空白 
+	scanf("%d",&number); 
+	char tr[1000];
+	char s[25];
+	info=start;
+	fp=opena();
+	for(int i=0;i<number;i++){
+		fscanf(fp,"%d %s",&hq,tr);
+		printf("%d : %s\n",hq,tr);
+	}
+}
+//增加数据中的重新定义行号 
+struct txt *add(struct txt *head){
+	int num=1;
+	struct txt *tail=head;
+	while(tail->next!=NULL){
+		tail=tail->next;
+		tail->r=num;
+		num++;
+	}
+	return head;
+}
+//删除数据中的重定义行号 
+struct txt *dela(struct txt *head){
+	int num=1;
+	struct txt *tail=head;
+	while(tail->next!=NULL){
+		tail=tail->next;
+		tail->r=num;
+		num++;
+	}
+	return head;
+}
+//创建新的链表 
+struct txt *create(int m){
+	int i;
+    struct txt *head=start;
+    head=(struct txt*)malloc(sizeof(struct txt));
+    struct txt *rear;
+    struct txt *tail=NULL;
+	tail=head;
+	//以尾结法创建链表 
+    for(i=1;i<=m;i++){
+    	rear=(struct txt*)malloc(sizeof(struct txt));
+    	scanf("%d ",&rear->r);
+    	gets(rear->str);
+        tail->next=rear;
+        tail=rear;
+    }
+    tail->next=NULL;
+	//构造好链表后，更新行号 
+    add(head);
+    return head; 
+}
+//拼接链表 
+struct txt *multy(struct txt *ptr1,struct txt *ptr2,int r){
+	struct txt *rear,*ptrCopy,*tail=ptr2->next,*head,*pl,*pm;
+	//指针ptrCopy指向新建指针的头 
+	ptrCopy=tail;
+	//head指向原始链表的头节点处 
+	head=ptr1;
+	//拷贝ptr2的链表到 
+	while(ptr2->next!=NULL){
+		rear=(struct txt*)malloc(sizeof(struct txt));
+		tail=(struct txt*)malloc(sizeof(struct txt));
+		rear->r=ptr2->r;
+		mystrcpy(rear->str,ptr2->str);
+		ptr2=ptr2->next;
+		tail->next=rear;
+		tail=rear;
+	}
+	if(r!=1){
+		while(ptr1->r!=r-1){
+			ptr1=ptr1->next;
+		}
+	}
+	pl=ptr1->next;
+	pm=ptrCopy;
+	while(pm->next!=NULL){
+		pm=pm->next;
+	}
+	pm->next=pl;
+	ptr1->next=ptrCopy;
+	head=add(head);
+	return head;
+}
+//添加新链表 
+struct txt *insert(int m){
+	int i;
+    struct txt *head;
+    head=(struct txt*)malloc(sizeof(struct txt));
+    struct txt *rear;
+    struct txt *tail=NULL;
+	tail=head;
+    for(i=1;i<=m;i++){
+    	rear=(struct txt*)malloc(sizeof(struct txt));
+    	scanf("%d ",&rear->r);
+    	gets(rear->str);
+        tail->next=rear;
+        tail=rear;
+    }
+    tail->next=NULL;
+    add(head);
+    return head;
+}
+//删除数据 
+struct txt *del(int m){
+	struct txt *ptr1,*ptr2;
+	int count=0;
+	if(start!=NULL&&start->r==m){
+		count++;
+		ptr2=start;
+		start=start->next;
+		free(ptr2);
+	}
+	if(start==NULL) return NULL;
+	ptr1=start;
+	ptr2=start->next;
+	while(ptr2!=NULL){
+		if(ptr2->r==m){
+			count++;
+			ptr1->next=ptr2->next;
+			free(ptr2);
+		}
+		else ptr1=ptr2;
+		ptr2=ptr2->next;
+	}
+	if(count==0) printf("很遗憾，没有找到要删除的字符串！请重新执行程序！\n"); 
+	return start;
+}
+//拷贝 
+struct txt *copya(int n,int m,int k){
+	struct txt *ptr1,*ptr2,*ptr3,*ptr,*pl,*rear;
+	int x;	//计算到n行的长度 
+	pl=start;
+	while(pl->next!=NULL){
+		pl=pl->next;
+	}
+	int number;
+	ptr=start;
+	//ptr指向链表末端，统计链表长度 
+	while(ptr!=NULL){
+		ptr=ptr->next;
+		number++;
+	}
+	ptr1=start;
+	//ptr1指向链表中k-1的位置 
+	if(k==0){
+		ptr1=(struct txt *)malloc(sizeof(struct txt));
+		ptr1->next=start;
+	}
+	else if(k-1>number){
+		ptr1=(struct txt *)malloc(sizeof(struct txt));
+		pl->next=ptr1;
+	}
+	else{
+		while(ptr1->r!=k-1){
+			ptr1=ptr1->next;
+		}
+	}
+	//ptr2指向链表中k的位置 
+	ptr2=ptr1->next;
+	//ptr3找到要插的内容，即第n行指向的内容 
+	ptr3=start;
+	if(n==0&&n==1){
+		ptr3=start->next;
+		n=0; 
+	}
+	else if(n>number){
+		ptr3=ptr;
+		n=number;
+	}
+	else{
+		while(ptr3->r!=n){
+			ptr3=ptr3->next;
+		}
+		n=number-m;
+	}
+	int tg=number-n;	//定义具体要插的行数的最大值 
+	if(m>tg) m=tg;
+	for(int i=0;i<m;i++){
+		rear=(struct txt *)malloc(sizeof(struct txt));
+		rear->r=ptr3->r;
+		mystrcpy(rear->str,ptr3->str);
+		ptr3=ptr3->next;
+		rear->next=ptr2;
+		ptr1->next=rear;
+		ptr1=rear; 
+	}
+	//再拷贝结束后更新行号 
+	add(start);
+	return start;
+}
+//修改 
+int modify(int x){
+	struct txt *info;
+	char temp[1000];
+	info=start->next;
+	int num=0;
+	//查找要修改字符串的行号，进行字符串修改 
+	while(info!=NULL){
+		if(info->r==x){
+			printf("请输入修改后的字符串：\n");
+			scanf("%s",temp);
+			mystrcpy(info->str,temp);			//调用字符串拷贝函数进行拷贝 
+			return 1;
+		}
+		info=info->next;
+	}
+	return 0;
+}
+//按行查找 
+void find(int d){
+	struct txt *info;
+	int flog=0;
+	info=start;
+	//遍历行号，查找要的字符串 
+	while(info->r!=d){
+		info=info->next;
+		if(info==NULL){
+			printf("没有找到该字符串，请重新执行该操作！\n");
+			flog=1;
+			break;
+		}
+	}
+	if(info->r==d&&flog==0) printf("%s\n",info->str);
+}
+//按字符串查找 
+void finda(char s[]){
+	int x,i;
+	struct txt *info;
+	info=start;
+	//对比字符串，查找目标字符串 
+	while(1){
+		if(info==NULL){
+			printf("没有找到，请重新来过！\n");
+			break; 
+		}
+		i=mystrcmp(info->str,s);
+		if(i>=0){
+			printf("%s\n",info->str);
+			printf("请问是否继续查找？\n1.是 2.否");
+			scanf("%d",&x);
+			if(x==2){
+				break;
+			} 
+		}
+		info=info->next;
+	}
+}
+//按行对字符串替换 
+int change(int f){
+	struct txt *info;
+	info=start->next;
+	char cha[1000];
+	while(info->r!=f){
+		info=info->next;
+		if(info->next==NULL) break;
+	}
+	//找到要修改的行，进行字符串替换 
+	if(info->r==f){
+		printf("请输入要替换的字符串： ");
+		scanf("%s",cha);
+		mystrcpy(info->str,cha); 
+		return 1;
+	}
+	return 0;
+}
+//按字符串替换 
+struct txt *changea(char ch[]){
+	struct txt *info;
+	info=start->next;
+	char chb[1000];
+	int x,xa; 
+	while(1){
+		//完全一样直接替换 
+		xa=mystrcmp(info->str,ch);
+		if(xa==0){				//调用字符串比较函数 
+			printf("请输入替换后的字符串：");
+			scanf("%s",chb);
+			mystrcpy(info->next->str,chb);			//调用字符串拷贝函数 
+			break;
+		}
+		//部分一样，全替换 
+		else if(xa==1){
+			printf("请问是否替换？是：1，否：0\n请输入数字： ");
+			scanf("%d",&x);
+			if(x==1){
+				printf("请输入替换后的字符串：\n");
+				scanf("\n");
+				gets(chb);
+				mystrcpya(info->str,chb,ch);			//调用字符串拷贝函数 
+				break;
+			}
+		}
+		info=info->next;
+		//没有找到，不替换 
+		if(info==NULL) printf("没有找到，请重新来过！");	 
+	}
+	return start;
+}
+//保存 
+void save(){
+	struct txt *info;
+	FILE *fp;
+	//打开可以写的文件 
+	fp=openb();
+	info=start->next;
+	//遍历链表，存储数据进文件 
+	while(info){
+		fprintf(fp,"%d %s\n",info->r,info->str);
+		info=info->next;
+	}
+	fclose(fp);
+	//释放链表空间
+	if(start!=NULL){
+		while(start->next!=NULL){
+			free(start);
+			start=start->next;
+		} 
+	} 
+}
